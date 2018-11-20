@@ -13,7 +13,7 @@
         android:layout_height="wrap_content" />
     <Button
         android:id="@+id/go_button"
-        android:text="GO!"
+        android:text="Get Questions/Refresh"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -21,5 +21,6 @@
         android:id="@+id/spinner"
         android:clickable="false"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"></Spinner>
+        android:layout_height="wrap_content" />
+
 </LinearLayout>
