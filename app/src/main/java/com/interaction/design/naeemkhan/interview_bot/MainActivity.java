@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -86,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     // Connect to the link and get the results from specified tag
-                    String username = "";
-                    String password = "";
+                    String username = "interbot";
+                    String password = "tahasucks9001";
                     String login = username + ":" + password;
                     String base64login = new String(Base64.encode(login.getBytes(), Base64.DEFAULT));
                     Document dataSource = Jsoup.connect("http://shootboys.net/interbot/showData.php").header("Authorization", "Basic " + base64login).get();
