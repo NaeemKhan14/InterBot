@@ -19,12 +19,14 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextToSpeech TTS;
+    private TextToSpeech TTS;
     private TextView textview;
-    private Button gobutton;
+    private Button startButton, resultsButton;
     private Spinner spinnerList;
     private ArrayAdapter<String> adapter;
-    private final ArrayList<String> results = new ArrayList<>();
+    private String[] questionLabels;
+    private final String[] questions = {"Hi, what is your name?", "How old are you?", "444444444444444444444444", "QQQQQQQQQQQQQQQQQQQQQ",
+    "PEEEEEEEEEEEEEEEEEEEEEEEEEEENIS", "What", "Hi, I'm gay", "Are you gay?", "INDEED, a wise choice", "Go back!"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +35,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the components of the app and assign them here for use
         textview = findViewById(R.id.text_view);
-        gobutton = findViewById(R.id.go_button);
-        // First value for TTS to play
-        results.add("Select a question from the list below");
+        startButton = findViewById(R.id.startButton);
+        resultsButton = findViewById(R.id.showResults);
+        questionLabels = new String[10];
+
+        for(int i = 0; i < questionLabels.length; i++) {
+            int count = i + 1;
+            questionLabels[i] = "Question #" + count;
+        }
 
         // Initialise Text-To-Speech
         TTS = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
@@ -48,26 +55,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // ActionListener for the gobutton
-        gobutton.setOnClickListener(new View.OnClickListener() {
+        // ActionListener for the start
+        startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Clear the data on refresh
-                if(adapter != null) {
-                    adapter.clear();
-                    adapter.notifyDataSetChanged();
-                }
-                getWebsiteData();
+                populateList();
+                resultsButton.setEnabled(true);
             }
         });
 
+        resultsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getWebsiteData();
+                resultsButton.setEnabled(false); // Disable the button once result is shown
+            }
+        });
     }
 
     private void getWebsiteData() {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                final ArrayList<String> result = new ArrayList<>();
                 try {
+
                     // Connect to the link and get the results from specified tag
                     String username = "";
                     String password = "";
@@ -79,20 +91,23 @@ public class MainActivity extends AppCompatActivity {
                     // Split the results at ### so we know where a new line is
                     String[] dataList = data.text().split("###");
 
-                    // Append each question into the ArrayList
+                    // Append each question into the result
                     for(String value : dataList) {
-                        results.add(value);
+                        result.add(value);
                     }
 
                 } catch (IOException e) {
                     e.getMessage();
                 }
 
-                // Once the results' list is populated, push the result into spinner
+                // Once the results' list is populated, push the result into textview
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        populateList();
+                        for(String value : result) {
+                            textview.append(value + "\n");
+                        }
+
                     }
                 });
             }
@@ -106,18 +121,18 @@ public class MainActivity extends AppCompatActivity {
 
         spinnerList.setSelection(0, false);
         // ArrayAdapter will handle the values that goes into spinner
-        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, results);
+        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, questionLabels);
         spinnerList.setAdapter(adapter);
 
         /*
-         * Whenever an item from spinner is selected, this listener will record that
-         * selection and display it in the spinner, as well as playing it
+         * Whenever an item from spinner is selected, this listener will select a question from the
+         * question's list based on that select question number
          */
         spinnerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                textview.setText(results.get(position));
-                TTS.speak(results.get(position), TextToSpeech.QUEUE_FLUSH, null);
+                textview.setText(questions[position]);
+                TTS.speak(questions[position], TextToSpeech.QUEUE_FLUSH, null);
             }
 
             @Override
