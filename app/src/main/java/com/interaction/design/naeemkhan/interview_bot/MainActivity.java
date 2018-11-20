@@ -3,7 +3,9 @@ package com.interaction.design.naeemkhan.interview_bot;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,12 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
     private TextToSpeech TTS;
     private TextView textview;
-    private Button startButton, resultsButton;
-    private Spinner spinnerList;
-    private ArrayAdapter<String> adapter;
+    private Button resultsButton;
     private String[] questionLabels;
-    private final String[] questions = {"Hi, what is your name?", "How old are you?", "444444444444444444444444", "QQQQQQQQQQQQQQQQQQQQQ",
-    "PEEEEEEEEEEEEEEEEEEEEEEEEEEENIS", "What", "Hi, I'm gay", "Are you gay?", "INDEED, a wise choice", "Go back!"};
+    private final String[] questions = {"Why do you want this job?", "What can you offer to this company?",
+            "Tell us about your work ethic.", "Are you a better working individually or in groups?",
+    "Are you willing to attend workshops to improve or gain skills?", "What", "Hi, I'm gay", "Are you gay?", "INDEED, a wise choice", "Go back!"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the components of the app and assign them here for use
         textview = findViewById(R.id.text_view);
-        startButton = findViewById(R.id.startButton);
+        Button startButton = findViewById(R.id.startButton);
         resultsButton = findViewById(R.id.showResults);
         questionLabels = new String[10];
 
@@ -67,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
         resultsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                textview.setText("");
+                //textview.setGravity(Gravity.TOP);
+                // Make textview scrollable
+                textview.setMovementMethod(new ScrollingMovementMethod());
                 getWebsiteData();
                 resultsButton.setEnabled(false); // Disable the button once result is shown
             }
@@ -87,13 +92,13 @@ public class MainActivity extends AppCompatActivity {
                     String base64login = new String(Base64.encode(login.getBytes(), Base64.DEFAULT));
                     Document dataSource = Jsoup.connect("http://shootboys.net/interbot/showData.php").header("Authorization", "Basic " + base64login).get();
                     // Get all the data inside <body> tag.
-                    Elements data = dataSource.select("body");
+                    Elements data = dataSource.getElementsByClass("results");
                     // Split the results at ### so we know where a new line is
                     String[] dataList = data.text().split("###");
 
                     // Append each question into the result
                     for(String value : dataList) {
-                        result.add(value);
+                        result.add(value.trim());
                     }
 
                 } catch (IOException e) {
@@ -116,12 +121,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void populateList() {
         // Initialize the spinner and enable it
-        spinnerList = findViewById(R.id.spinner);
+        Spinner spinnerList = findViewById(R.id.spinner);
         spinnerList.setEnabled(true);
 
         spinnerList.setSelection(0, false);
         // ArrayAdapter will handle the values that goes into spinner
-        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, questionLabels);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_spinner, questionLabels);
+        adapter.setDropDownViewResource(R.layout.custom_spinner);
         spinnerList.setAdapter(adapter);
 
         /*
