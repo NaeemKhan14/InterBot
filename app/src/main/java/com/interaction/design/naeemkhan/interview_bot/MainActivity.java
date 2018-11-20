@@ -3,6 +3,7 @@ package com.interaction.design.naeemkhan.interview_bot;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -51,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
         gobutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Clear the data on refresh
+                if(adapter != null) {
+                    adapter.clear();
+                    adapter.notifyDataSetChanged();
+                }
                 getWebsiteData();
             }
         });
@@ -66,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     String username = "";
                     String password = "";
                     String login = username + ":" + password;
-                    String base64login = new String(android.util.Base64.encode(login.getBytes(), android.util.Base64.DEFAULT));
+                    String base64login = new String(Base64.encode(login.getBytes(), Base64.DEFAULT));
                     Document dataSource = Jsoup.connect("http://shootboys.net/interbot/showData.php").header("Authorization", "Basic " + base64login).get();
                     // Get all the data inside <body> tag.
                     Elements data = dataSource.select("body");
@@ -86,36 +92,40 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        // Initialize the spinner and enable it
-                        spinnerList = findViewById(R.id.spinner);
-                        spinnerList.setEnabled(true);
-                        spinnerList.setSelection(0, false);
-                        // ArrayAdapter will handle the values that goes into spinner
-                        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, results);
-                        spinnerList.setAdapter(adapter);
-
-                        /*
-                         * Whenever an item from spinner is selected, this listener will record that
-                         * selection and display it in the spinner, as well as playing it
-                         */
-                        spinnerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                textview.setText(results.get(position));
-                                TTS.speak(results.get(position), TextToSpeech.QUEUE_FLUSH, null);
-                            }
-
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
-
-                            }
-                        });
+                        populateList();
                     }
                 });
             }
         }).start();
     }
 
+    private void populateList() {
+        // Initialize the spinner and enable it
+        spinnerList = findViewById(R.id.spinner);
+        spinnerList.setEnabled(true);
+
+        spinnerList.setSelection(0, false);
+        // ArrayAdapter will handle the values that goes into spinner
+        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, results);
+        spinnerList.setAdapter(adapter);
+
+        /*
+         * Whenever an item from spinner is selected, this listener will record that
+         * selection and display it in the spinner, as well as playing it
+         */
+        spinnerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                textview.setText(results.get(position));
+                TTS.speak(results.get(position), TextToSpeech.QUEUE_FLUSH, null);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
     // Force shutdown the TTS when app is closed
     @Override
     protected void onDestroy() {
