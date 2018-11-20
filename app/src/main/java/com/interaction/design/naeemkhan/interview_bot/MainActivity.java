@@ -9,11 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -65,7 +63,12 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     // Connect to the link and get the results from specified tag
-                    Document dataSource = Jsoup.connect("http://shootboys.net/sss.html").get();
+                    String username = "";
+                    String password = "";
+                    String login = username + ":" + password;
+                    String base64login = new String(android.util.Base64.encode(login.getBytes(), android.util.Base64.DEFAULT));
+                    Document dataSource = Jsoup.connect("http://shootboys.net/interbot/showData.php").header("Authorization", "Basic " + base64login).get();
+                    // Get all the data inside <body> tag.
                     Elements data = dataSource.select("body");
                     // Split the results at ### so we know where a new line is
                     String[] dataList = data.text().split("###");
@@ -92,9 +95,9 @@ public class MainActivity extends AppCompatActivity {
                         spinnerList.setAdapter(adapter);
 
                         /*
-                        * Whenever an item from spinner is selected, this listener will record that
-                        * selection and display it in the spinner, as well as playing it
-                        */
+                         * Whenever an item from spinner is selected, this listener will record that
+                         * selection and display it in the spinner, as well as playing it
+                         */
                         spinnerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                             @Override
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
