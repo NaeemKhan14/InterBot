@@ -24,9 +24,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView textview;
     private Button resultsButton;
     private String[] questionLabels;
-    private final String[] questions = {"Why do you want this job?", "What can you offer to this company?",
-            "Tell us about your work ethic.", "Are you a better working individually or in groups?",
-    "Are you willing to attend workshops to improve or gain skills?", "What", "Hi, I'm gay", "Are you gay?", "INDEED, a wise choice", "Go back!"};
+    private final String[] questions = {
+            "Why do you want this job?", "What can you offer to this company?", "Tell us about your " +
+            "work ethic.", "Are you a better working individually or in groups?", "Are you willing " +
+            "to attend workshops to improve or gain skills?", "What is your most significant " +
+            "accomplishment?", "What is your greatest strength", "What is your greatest weakness?",
+            "Which programming languages do you know and how proficient are you in it?", "What is " +
+            "the difference between C++ and C? Would you prefer to use one over the other?"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
